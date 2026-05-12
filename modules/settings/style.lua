@@ -1,5 +1,8 @@
+-- Import catppuccin colors
 local ctp = require("modules.mocha")
 hl.config({
+
+	-- gaps and colors
 	general = {
 		gaps_in = 3,
 		resize_on_border = true,
@@ -17,6 +20,17 @@ hl.config({
 			},
 		},
 	},
+
+	-- Scrolling layout settings
+	scrolling = {
+		column_width = 0.8,
+		follow_min_visible = 0.1,
+		focus_fit_method = 0,
+		wrap_focus = false,
+		wrap_swapcol = false,
+	},
+
+	-- Window appearence
 	decoration = {
 		rounding = 10,
 		rounding_power = 2,
@@ -34,4 +48,13 @@ hl.config({
 			vibrancy = 0.5,
 		},
 	},
+
+	-- Remove irritants
+	ecosystem = {
+		no_update_news = true,
+		no_donation_nag = true,
+	},
 })
+
+hl.env("XCURSOR_SIZE", "20")
+hl.env("HYPRCURSOR_SIZE", "20")
