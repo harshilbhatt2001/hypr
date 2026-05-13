@@ -22,7 +22,9 @@ elseif Hostname == "mobile02" then
 	}
 end
 
-table.insert(appList, localAppList)
+for _, command in ipairs(localAppList) do
+	table.insert(appList, command)
+end
 
 -- For everything in the applist run it on startup
 hl.on("hyprland.start", function()
