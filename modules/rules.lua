@@ -94,3 +94,32 @@ hl.window_rule({
 
 	no_focus = true,
 })
+
+-- Wlogout blur and stuff
+hl.layer_rule({
+	name = "wlogout blur",
+	match = {
+		namespace = "logout_dialog",
+	},
+	blur = true,
+})
+
+-- Notifications
+hl.layer_rule({
+	name = "notification blur",
+	match = {
+		namespace = "notifications",
+	},
+	blur = true,
+	ignore_alpha = 0,
+})
+
+-- Waybar blur
+hl.layer_rule({
+	name = "waybar blur",
+	match = {
+		namespace = "waybar",
+	},
+	blur = true,
+	ignore_alpha = 0,
+})

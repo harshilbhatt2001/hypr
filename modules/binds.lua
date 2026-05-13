@@ -13,7 +13,7 @@ if Hostname == "mobile02" then
 end
 
 -- Delete windows
-hl.bind(mainMod .. " + backspace", hl.dsp.window.close())
+hl.bind(mainMod .. "backspace", hl.dsp.window.close())
 
 -- If otter is open, focus it, if not make a new window
 hl.bind(mainMod .. "d", function()
@@ -29,6 +29,7 @@ local globalAppBinds = {
 	{ key = { "RETURN" }, dispatch = "kitty" },
 	{ key = { "f", "o" }, dispatch = "firefox" },
 	{ key = { "s" }, dispatch = "nemo" },
+	{ key = { "a", "e" }, dispatch = "wlogout -b 5" },
 }
 
 for _, bind in ipairs(globalAppBinds) do
@@ -50,8 +51,6 @@ for index, bind in ipairs(keyboardSplit) do
 	hl.bind(mainMod .. bind, hl.dsp.focus({ workspace = index }))
 	hl.bind(mainMod .. "SHIFT + " .. bind, hl.dsp.window.move({ workspace = index, follow = false }))
 end
-
-
 
 -- Music workspace
 hl.bind(mainMod .. "m", hl.dsp.workspace.toggle_special("music"))
