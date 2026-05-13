@@ -51,6 +51,8 @@ for index, bind in ipairs(keyboardSplit) do
 	hl.bind(mainMod .. "SHIFT + " .. bind, hl.dsp.window.move({ workspace = index, follow = false }))
 end
 
+
+
 -- Music workspace
 hl.bind(mainMod .. "m", hl.dsp.workspace.toggle_special("music"))
 
@@ -110,7 +112,7 @@ hl.bind(mainMod .. "minus", hl.dsp.workspace.toggle_special("scratch"))
 hl.bind(mainMod .. "SHIFT + minus", hl.dsp.window.move({ workspace = "special:scratch", follow = false }))
 
 -- Float resize and move window with mouse
-hl.bind(subMod .. "mouse:272", hl.dsp.window.drag(), { mouse = true, drag = true })
+hl.bind(subMod .. "mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(subMod .. "mouse:272", hl.dsp.window.float(), { mouse = true, click = true })
 hl.bind(subMod .. "mouse:272", hl.dsp.layout("promote"), { mouse = true, release = true })
 

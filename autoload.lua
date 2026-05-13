@@ -12,6 +12,7 @@ end
 -- Recursively search and return modules
 for path in p:lines() do
 	local ok, err = pcall(dofile, path)
+	-- If you fucked up the syntax like an idiot
 	if not ok then
 		hl.notification.create({
 			text = "autoload: " .. path .. "\n" .. tostring(err),
