@@ -38,9 +38,6 @@ for _, bezier in ipairs(beziers) do
 end
 
 local animations = {
-	-- Default animation
-	{ leaf = "global", speed = 5, spring = "mediumSpring" },
-
 	-- Window animations
 	{ leaf = "windows", speed = 2, spring = "mediumSpring", style = "slide right" },
 	{ leaf = "windowsOut", speed = 2, bezier = "heavyOvershoot", style = "popin 30%" },

@@ -1,4 +1,8 @@
 -- Size for otter launcher
+local otterSize = { 410, 220 }
+if Hostname == "mobile02" then
+	otterSize = { 420, 220 }
+end
 hl.window_rule({
 	name = "otter-launcher",
 	match = {
@@ -6,7 +10,7 @@ hl.window_rule({
 	},
 	float = true,
 	animation = "popin 80%",
-	size = { 410, 220 },
+	size = otterSize,
 	opaque = true,
 })
 
