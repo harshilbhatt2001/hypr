@@ -1,0 +1,10 @@
+{
+  "workspace": {
+    "library": [
+      "/nix/store/k1jc5h9ls6j600hcpjciqn0s29whas63-hyprland-0.55.0+date=2026-05-11_5e441ca/share/hypr/stubs/hl.meta.lua"
+    ]
+  },
+  "diagnostics": {
+    "globals": ["hl"]
+  }
+}
