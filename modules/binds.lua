@@ -25,18 +25,20 @@ hl.bind(mainMod .. "d", function()
 end)
 
 -- Open windows
-local globalAppBinds = {
+local appBinds = {
 	{ key = { "RETURN" }, dispatch = "kitty" },
 	{ key = { "f", "o" }, dispatch = "firefox" },
 	{ key = { "s" }, dispatch = "nemo" },
 	{ key = { "a", "e" }, dispatch = "wlogout -b 5" },
+	{ mod = subMod, key = { "SHIFT + s" }, dispatch = "grimblast copy area" },
 }
 
-for _, bind in ipairs(globalAppBinds) do
+for _, bind in ipairs(appBinds) do
+	local modBind = bind.mod or mainMod
 	if bind.key[keybindIndex] then
-		hl.bind(mainMod .. bind.key[keybindIndex], hl.dsp.exec_cmd(bind.dispatch))
+		hl.bind(modBind .. bind.key[keybindIndex], hl.dsp.exec_cmd(bind.dispatch))
 	else
-		hl.bind(mainMod .. bind.key[1], hl.dsp.exec_cmd(bind.dispatch))
+		hl.bind(modBind .. bind.key[1], hl.dsp.exec_cmd(bind.dispatch))
 	end
 end
 
@@ -80,6 +82,7 @@ local function normalise_current_window_pos()
 	end
 end
 
+-- Change scroll binds to be better
 hl.bind(mainMod .. "h", function()
 	local pos = normalise_current_window_pos()
 	if pos then
@@ -87,9 +90,11 @@ hl.bind(mainMod .. "h", function()
 		if pos == 9 then
 			-- If first window, then move to monitor to the left
 			hl.dispatch(hl.dsp.focus({ monitor = "-1" }))
+		else
+			-- If not the first window then go to the column to the left
+			hl.dispatch(hl.dsp.layout("move -col"))
 		end
 	end
-	hl.dispatch(hl.dsp.layout("move -col"))
 end)
 
 hl.bind(mainMod .. "l", function()

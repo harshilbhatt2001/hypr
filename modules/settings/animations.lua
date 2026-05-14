@@ -11,6 +11,7 @@ local beziers = {
 	-- Springs
 	{ name = "hardSpring", kind = "spring" },
 	{ name = "mediumSpring", kind = "spring", stiffness = 50, dampening = 10 },
+	{ name = "heavierSpring", kind = "spring", mass = 1.2, stiffness = 50, dampening = 11 },
 	{ name = "looseSpring", kind = "spring", dampening = 5, stiffness = 50 },
 }
 
@@ -39,7 +40,7 @@ end
 
 local animations = {
 	-- Window animations
-	{ leaf = "windows", speed = 2, spring = "mediumSpring", style = "slide right" },
+	{ leaf = "windows", speed = 2, spring = "heavierSpring", style = "slide right" },
 	{ leaf = "windowsOut", speed = 2, bezier = "heavyOvershoot", style = "popin 30%" },
 
 	-- Fade
