@@ -2,21 +2,19 @@ local appList = {
 	"waybar",
 	"dunst",
 	"wpaperd -d",
-	"wayvnc 0.0.0.0 --output=DP-1",
 	"syncthing -home=/home/user01/.config/syncthing -no-browser",
 	"gotify-desktop",
-	"sleep 10 && curl -X POST -H 'Content-Type: application/json' -d '{'ref':'$(git -C ~/.dotfiles rev-parse HEAD)', 'status':'$(git -C ~/.dotfiles diff --quiet && echo 'clean' || echo 'dirty')'}' https://n8n.voidarc.co.uk/webhook/config-checker",
+	'sleep 5 && curl -X POST -H "Content-Type: application/json" -d "{\\"ref\\":\\"$(git -C ~/.dotfiles rev-parse HEAD)\\", \\"status\\":\\"$(git -C ~/.dotfiles diff --quiet && echo "clean" || echo "dirty")\\"}" https://n8n.voidarc.co.uk/webhook/config-checker',
 }
 
 local localAppList
 if Hostname == "HACKSTATION" then
-	-- If on desktop do all the decoration nonsense
+	-- If on desktop do desktop things
 	localAppList = {
-		"kitten panel --edge=background -o background_opacity=0 --output-name HDMI-A-1 sh -c 'cmatrix -b -C magenta -a -u 10'",
-		"kitten panel --edge=background -o background_opacity=0 --output-name DP-2 sh -c 'cava'",
+		"wayvnc 0.0.0.0 --output=DP-1",
 	}
 elseif Hostname == "mobile02" then
-	-- If on laptop, launch way-edges
+	-- If on laptop, do laptop things
 	localAppList = {
 		"way-edges",
 	}
