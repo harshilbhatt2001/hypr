@@ -25,7 +25,7 @@ hl.bind(mainMod .. "d", function()
 end)
 
 -- Open windows
-local appBinds = {
+local globalAppBinds = {
 	{ key = { "RETURN" }, dispatch = "kitty" },
 	{ key = { "f", "o" }, dispatch = "firefox" },
 	{ key = { "s" }, dispatch = "nemo" },
@@ -33,7 +33,7 @@ local appBinds = {
 	{ mod = subMod, key = { "SHIFT + s" }, dispatch = "grimblast copy area" },
 }
 
-for _, bind in ipairs(appBinds) do
+for _, bind in ipairs(globalAppBinds) do
 	local modBind = bind.mod or mainMod
 	if bind.key[keybindIndex] then
 		hl.bind(modBind .. bind.key[keybindIndex], hl.dsp.exec_cmd(bind.dispatch))
@@ -89,7 +89,7 @@ hl.bind(mainMod .. "h", function()
 		-- 9 derived from 5 gap plus 3 border (8), so first pixel of window is 9
 		if pos == 9 then
 			-- If first window, then move to monitor to the left
-			hl.dispatch(hl.dsp.focus({ monitor = "-1" }))
+			hl.dispatch(hl.dsp.focus({ monitor = "+1" }))
 		else
 			-- If not the first window then go to the column to the left
 			hl.dispatch(hl.dsp.layout("move -col"))
@@ -104,7 +104,7 @@ hl.bind(mainMod .. "l", function()
 		-- Go back a window
 		hl.dispatch(hl.dsp.layout("move -col"))
 		-- Move to monitor to the right
-		hl.dispatch(hl.dsp.focus({ monitor = "+1" }))
+		hl.dispatch(hl.dsp.focus({ monitor = "-1" }))
 	end
 end)
 
