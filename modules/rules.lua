@@ -27,18 +27,19 @@ hl.window_rule({
 
 -- Define windows that float
 local standardFloatingWindows = {
-	{ class = "^(xdg-desktop-portal-gtk)$" },
-	{ class = "^(firefox)$", title = "^(.*Save.*)" },
+	{ class = "xdg-desktop-portal-gtk" },
+	{ class = "org.pulseaudio.pavucontrol" },
+	{ class = "firefox", title = ".*Save.*" },
 }
 
 -- For every window that floats make a rule
 for _, window in ipairs(standardFloatingWindows) do
 	hl.window_rule({
-		name = "float file selector",
+		name = ("float " .. window.class),
 		match = {
 			-- both are optional ig
-			class = window.class or "",
-			title = window.title or "",
+			class = ("^(" .. (window.class or "") .. ")$"),
+			title = ("^(" .. (window.title or "") .. ")"),
 		},
 		float = true,
 		animation = "popin 70%",
