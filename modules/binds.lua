@@ -111,6 +111,9 @@ end)
 -- Fullscreen with b
 hl.bind(mainMod .. "b", hl.dsp.window.fullscreen({ action = "toggle" }))
 
+-- SubMod plus space to float
+hl.bind(subMod .. "space", hl.dsp.window.float())
+
 -- Special workspace
 hl.bind(mainMod .. "minus", hl.dsp.workspace.toggle_special("scratch"))
 hl.bind(mainMod .. "SHIFT + minus", hl.dsp.window.move({ workspace = "special:scratch", follow = false }))
@@ -119,5 +122,4 @@ hl.bind(mainMod .. "SHIFT + minus", hl.dsp.window.move({ workspace = "special:sc
 hl.bind(subMod .. "mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(subMod .. "mouse:272", hl.dsp.window.float(), { mouse = true, click = true })
 hl.bind(subMod .. "mouse:272", hl.dsp.layout("promote"), { mouse = true, release = true })
-
 hl.bind(subMod .. "SHIFT + mouse:272", hl.dsp.window.resize(), { mouse = true })
