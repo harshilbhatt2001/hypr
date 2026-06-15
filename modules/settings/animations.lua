@@ -11,7 +11,7 @@ local beziers = {
 	-- Springs
 	{ name = "hardSpring", kind = "spring" },
 	{ name = "mediumSpring", kind = "spring", stiffness = 50, dampening = 10 },
-	{ name = "heavierSpring", kind = "spring", mass = 1.2, stiffness = 50, dampening = 11 },
+	{ name = "heavierSpring", kind = "spring", mass = 1.3, stiffness = 50, dampening = 11 },
 	{ name = "looseSpring", kind = "spring", dampening = 5, stiffness = 50 },
 }
 
