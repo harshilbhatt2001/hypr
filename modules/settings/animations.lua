@@ -29,8 +29,8 @@ for _, bezier in ipairs(beziers) do
 			type = "spring",
 			-- If all the parameters are empty make a spring with the values from the wiki
 			mass = bezier.mass or 1,
-			stiffness = bezier.stiffness or 70,
-			dampening = bezier.dampening or 10,
+			stiffness = (bezier.stiffness or 70) + 400,
+			dampening = (bezier.dampening or 10) + 17,
 		})
 	else
 		-- You fucked something up
