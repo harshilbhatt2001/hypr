@@ -137,3 +137,12 @@ hl.layer_rule({
 	blur = false,
 	ignore_alpha = 0,
 })
+
+hl.layer_rule({
+	name = "showkeys",
+	match = {
+		namespace = "showkeys",
+	},
+	blur = false,
+	no_anim = true,
+})
