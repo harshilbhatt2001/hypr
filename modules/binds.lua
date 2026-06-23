@@ -1,69 +1,3 @@
--- Set modifier keys
-local mainMod = "SUPER + "
-local subMod = mainMod
-local keyboardString = "qwertyuiop"
-local keybindIndex = 1
-
--- Set different modifiers on laptop
-if Hostname == "mobile02" then
-	mainMod = "ALT + "
-	subMod = "SUPER + "
-	keyboardString = "1234567890"
-	keybindIndex = 2
-end
-
--- Delete windows
-hl.bind(mainMod .. "backspace", hl.dsp.window.close())
-
--- If otter is open, focus it, if not make a new window
-hl.bind(mainMod .. "d", function()
-	if hl.get_windows({ class = "otter" })[1] ~= nil then
-		hl.dispatch(hl.dsp.focus({ window = "class:otter" }))
-	else
-		hl.exec_cmd("kitty --class otter --title otter-launcher -e sh -c 'sleep 0.05 && otter-launcher'")
-	end
-end)
-
--- Open windows
-local globalAppBinds = {
-	{ key = { "RETURN" }, dispatch = "kitty" },
-	{ key = { "f", "o" }, dispatch = "firefox" },
-	{ key = { "s" }, dispatch = "nemo" },
-	{ key = { "a", "e" }, dispatch = "wlogout -b 5" },
-	{ mod = subMod, key = { "SHIFT + s" }, dispatch = "grimblast copy area" },
-}
-
-for _, bind in ipairs(globalAppBinds) do
-	local modBind = bind.mod or mainMod
-	if bind.key[keybindIndex] then
-		hl.bind(modBind .. bind.key[keybindIndex], hl.dsp.exec_cmd(bind.dispatch))
-	else
-		hl.bind(modBind .. bind.key[1], hl.dsp.exec_cmd(bind.dispatch))
-	end
-end
-
--- Workspace functions
-local keyboardSplit = {}
-
-for char in keyboardString:gmatch(".") do
-	table.insert(keyboardSplit, char)
-end
-
-for index, bind in ipairs(keyboardSplit) do
-	hl.bind(mainMod .. bind, hl.dsp.focus({ workspace = index }))
-	hl.bind(mainMod .. "SHIFT + " .. bind, hl.dsp.window.move({ workspace = index, follow = false }))
-end
-
--- Music workspace
-hl.bind(mainMod .. "m", hl.dsp.workspace.toggle_special("music"))
-
--- Move windows with hjkl
-hl.bind(mainMod .. "SHIFT + h", hl.dsp.layout("swapcol l"))
-hl.bind(mainMod .. "SHIFT + l", hl.dsp.layout("swapcol r"))
-hl.bind(mainMod .. "k", hl.dsp.focus({ direction = "up" }))
-hl.bind(mainMod .. "j", hl.dsp.focus({ direction = "down" }))
-
--- Function to get window position relative to monitor
 local function normalise_current_window_pos()
 	local active = hl.get_active_window()
 	if active then
@@ -82,44 +16,168 @@ local function normalise_current_window_pos()
 	end
 end
 
--- Change scroll binds to be better
-hl.bind(mainMod .. "h", function()
-	local pos = normalise_current_window_pos()
-	if pos then
-		-- 9 derived from 5 gap plus 3 border (8), so first pixel of window is 9
-		if pos == 9 then
-			-- If first window, then move to monitor to the left
-			hl.dispatch(hl.dsp.focus({ monitor = "+1" }))
-		else
-			-- If not the first window then go to the column to the left
-			hl.dispatch(hl.dsp.layout("move -col"))
-		end
+local function notif(text, timeout, icon)
+	hl.notification.create({
+		text = text or "notification",
+		timeout = timeout or 2000,
+		icon = icon or "ok",
+	})
+end
+
+-- Set modifier keys
+local mainMod = "SUPER + "
+local subMod = mainMod
+local keyboardString = "qwertyuiop"
+local keybindIndex = 1
+local recordingMode = 0
+
+-- Set different modifiers on laptop
+if Hostname == "mobile02" then
+	mainMod = "ALT + "
+	subMod = "SUPER + "
+	keyboardString = "1234567890"
+	keybindIndex = 2
+end
+
+local globalAppBinds = {
+	{ mod = subMod, key = { "mouse:272" }, dispatch = hl.dsp.window.drag(), opts = { mouse = true } },
+	{ mod = subMod, key = { "mouse:272" }, dispatch = hl.dsp.window.float(), opts = { mouse = true, click = true } },
+	{
+		mod = subMod,
+		key = { "mouse:272" },
+		dispatch = hl.dsp.layout("promote"),
+		opts = { mouse = true, release = true },
+	},
+	{ mod = subMod, key = { "SHIFT + mouse:272" }, dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
+
+	{ key = { "b", "f" }, dispatch = hl.dsp.window.fullscreen({ action = "toggle" }) },
+	{ mod = subMod, key = { "space" }, dispatch = hl.dsp.window.float() },
+	{ key = { "minus" }, dispatch = hl.dsp.workspace.toggle_special("scratch") },
+	{ key = { "SHIFT + minus" }, dispatch = hl.dsp.window.move({ workspace = "special:scratch", follow = false }) },
+
+	-- Launcher
+	{
+		key = { "d" },
+		dispatch = function()
+			if hl.get_windows({ class = "otter" })[1] ~= nil then
+				hl.dispatch(hl.dsp.focus({ window = "class:otter" }))
+			else
+				hl.exec_cmd("kitty --class otter --title otter-launcher -e sh -c 'sleep 0.05 && otter-launcher'")
+			end
+		end,
+	},
+
+	-- Close windows
+	{ key = { "BACKSPACE" }, dispatch = hl.dsp.window.close() },
+
+	---- Apps
+	-- Terminal
+	{
+		key = { "RETURN" },
+		dispatch = function()
+			if recordingMode == 1 then
+				hl.exec_cmd("kitty -o font_size=24 -o window_margin_width=20")
+			else
+				hl.exec_cmd("kitty")
+			end
+		end,
+	},
+
+	-- Firefox and file browser
+	{ key = { "f", "o" }, dispatch = "firefox" },
+	{ key = { "s" }, dispatch = "nemo" },
+
+	---- Move windows
+	{ key = { "k" }, dispatch = hl.dsp.focus({ direction = "up" }) },
+	{ key = { "j" }, dispatch = hl.dsp.focus({ direction = "down" }) },
+	{ key = { "SHIFT + h" }, dispatch = hl.dsp.layout("swapcol l") },
+	{ key = { "SHIFT + l" }, dispatch = hl.dsp.layout("swapcol r") },
+	{
+		key = { "l" },
+		dispatch = function()
+			-- Move before so you can detect if it is the last window
+			hl.dispatch(hl.dsp.layout("move +col"))
+			if not normalise_current_window_pos() then
+				-- Go back a window
+				hl.dispatch(hl.dsp.layout("move -col"))
+				-- Move to monitor to the right
+				hl.dispatch(hl.dsp.focus({ monitor = "right" }))
+			end
+		end,
+	},
+	{
+		key = { "h" },
+		dispatch = function()
+			local pos = normalise_current_window_pos()
+			if pos then
+				-- 9 derived from 5 gap plus 3 border (8), so first pixel of window is 9
+				if pos == 9 then
+					-- If first window, then move to monitor to the left
+					hl.dispatch(hl.dsp.focus({ monitor = "left" }))
+				else
+					-- If not the first window then go to the column to the left
+					hl.dispatch(hl.dsp.layout("move -col"))
+				end
+			end
+		end,
+	},
+
+	---- Special Workspaces
+	{ key = { "m" }, dispatch = hl.dsp.workspace.toggle_special("music") },
+
+	-- Youtuber mode lol
+	{
+		key = { "z" },
+		dispatch = function()
+			if recordingMode == 0 then
+				recordingMode = 1
+				hl.exec_cmd(
+					"wshowkeys -a right -F 'FiraMono Nerd Font 35' -s '#cba6f7ff' -f  '#cdd6f4ff' -b '#45475a99' -m 70 -l 60 -t 1000 -a top"
+				)
+				notif("Recording Mode Enabled")
+			else
+				recordingMode = 0
+				hl.exec_cmd("pkill wshowkeys")
+				notif("Recording Mode Disabled")
+			end
+		end,
+	},
+
+	-- Logout menu
+	{ key = { "a", "e" }, dispatch = "wlogout -b 5" },
+
+	-- Screenshot
+	{ mod = subMod, key = { "SHIFT + s" }, dispatch = "grimblast copy area" },
+}
+
+-- Workspace switch keys
+for _, bind in ipairs(globalAppBinds) do
+	local modBind = bind.mod or mainMod
+	local command
+	if type(bind.dispatch) ~= "string" then
+		command = bind.dispatch
+	else
+		command = hl.dsp.exec_cmd(bind.dispatch)
 	end
-end)
-
-hl.bind(mainMod .. "l", function()
-	-- Move before so you can detect if it is the last window
-	hl.dispatch(hl.dsp.layout("move +col"))
-	if not normalise_current_window_pos() then
-		-- Go back a window
-		hl.dispatch(hl.dsp.layout("move -col"))
-		-- Move to monitor to the right
-		hl.dispatch(hl.dsp.focus({ monitor = "-1" }))
+	local opts = {}
+	if bind.opts then
+		opts = bind.opts
 	end
-end)
+	if bind.key[keybindIndex] then
+		hl.bind(modBind .. bind.key[keybindIndex], command, opts)
+	else
+		hl.bind(modBind .. bind.key[1], command)
+	end
+end
 
--- Fullscreen with b
-hl.bind(mainMod .. "b", hl.dsp.window.fullscreen({ action = "toggle" }))
+-- Workspace functions
+local keyboardSplit = {}
 
--- SubMod plus space to float
-hl.bind(subMod .. "space", hl.dsp.window.float())
+for char in keyboardString:gmatch(".") do
+	table.insert(keyboardSplit, char)
+end
 
--- Special workspace
-hl.bind(mainMod .. "minus", hl.dsp.workspace.toggle_special("scratch"))
-hl.bind(mainMod .. "SHIFT + minus", hl.dsp.window.move({ workspace = "special:scratch", follow = false }))
-
--- Float resize and move window with mouse
-hl.bind(subMod .. "mouse:272", hl.dsp.window.drag(), { mouse = true })
-hl.bind(subMod .. "mouse:272", hl.dsp.window.float(), { mouse = true, click = true })
-hl.bind(subMod .. "mouse:272", hl.dsp.layout("promote"), { mouse = true, release = true })
-hl.bind(subMod .. "SHIFT + mouse:272", hl.dsp.window.resize(), { mouse = true })
+for index, bind in ipairs(keyboardSplit) do
+	hl.bind(mainMod .. bind, hl.dsp.focus({ workspace = index }))
+	hl.bind(mainMod .. "SHIFT + " .. bind, hl.dsp.window.move({ workspace = index, follow = false }))
+end
