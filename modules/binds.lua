@@ -1,3 +1,4 @@
+-- Get window position relative to monitor
 local function normalise_current_window_pos()
 	local active = hl.get_active_window()
 	if active then
@@ -16,6 +17,7 @@ local function normalise_current_window_pos()
 	end
 end
 
+-- Notification helper function
 local function notif(text, timeout, icon)
 	hl.notification.create({
 		text = text or "notification",
@@ -40,21 +42,13 @@ if Hostname == "mobile02" then
 end
 
 local globalAppBinds = {
-	{ mod = subMod, key = { "mouse:272" }, dispatch = hl.dsp.window.drag(), opts = { mouse = true } },
-	{ mod = subMod, key = { "mouse:272" }, dispatch = hl.dsp.window.float(), opts = { mouse = true, click = true } },
-	{
-		mod = subMod,
-		key = { "mouse:272" },
-		dispatch = hl.dsp.layout("promote"),
-		opts = { mouse = true, release = true },
-	},
-	{ mod = subMod, key = { "SHIFT + mouse:272" }, dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
 
+	---- Window functions
+	{ key = { "BACKSPACE" }, dispatch = hl.dsp.window.close() },
 	{ key = { "b", "f" }, dispatch = hl.dsp.window.fullscreen({ action = "toggle" }) },
 	{ mod = subMod, key = { "space" }, dispatch = hl.dsp.window.float() },
-	{ key = { "minus" }, dispatch = hl.dsp.workspace.toggle_special("scratch") },
-	{ key = { "SHIFT + minus" }, dispatch = hl.dsp.window.move({ workspace = "special:scratch", follow = false }) },
 
+	---- Apps
 	-- Launcher
 	{
 		key = { "d" },
@@ -67,10 +61,6 @@ local globalAppBinds = {
 		end,
 	},
 
-	-- Close windows
-	{ key = { "BACKSPACE" }, dispatch = hl.dsp.window.close() },
-
-	---- Apps
 	-- Terminal
 	{
 		key = { "RETURN" },
@@ -124,6 +114,8 @@ local globalAppBinds = {
 
 	---- Special Workspaces
 	{ key = { "m" }, dispatch = hl.dsp.workspace.toggle_special("music") },
+	{ key = { "minus" }, dispatch = hl.dsp.workspace.toggle_special("scratch") },
+	{ key = { "SHIFT + minus" }, dispatch = hl.dsp.window.move({ workspace = "special:scratch", follow = false }) },
 
 	-- Youtuber mode lol
 	{
@@ -148,6 +140,17 @@ local globalAppBinds = {
 
 	-- Screenshot
 	{ mod = subMod, key = { "SHIFT + s" }, dispatch = "grimblast copy area" },
+
+	-- Mouse for moving windows
+	{ mod = subMod, key = { "mouse:272" }, dispatch = hl.dsp.window.drag(), opts = { mouse = true } },
+	{ mod = subMod, key = { "mouse:272" }, dispatch = hl.dsp.window.float(), opts = { mouse = true, click = true } },
+	{
+		mod = subMod,
+		key = { "mouse:272" },
+		dispatch = hl.dsp.layout("promote"),
+		opts = { mouse = true, release = true },
+	},
+	{ mod = subMod, key = { "SHIFT + mouse:272" }, dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
 }
 
 -- Workspace switch keys
