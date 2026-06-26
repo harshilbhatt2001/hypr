@@ -1,6 +1,4 @@
 local appList = {
-	"waybar",
-	"dunst",
 	"wpaperd -d",
 	"syncthing -home=/home/user01/.config/syncthing -no-browser",
 	"gotify-desktop",
@@ -12,11 +10,14 @@ if Hostname == "HACKSTATION" then
 	-- If on desktop do desktop things
 	localAppList = {
 		"wayvnc 0.0.0.0 --output=DP-1",
+		"quickshell",
 	}
 elseif Hostname == "mobile02" then
 	-- If on laptop, do laptop things
 	localAppList = {
 		"way-edges",
+		"waybar",
+		"dunst",
 	}
 end
 
