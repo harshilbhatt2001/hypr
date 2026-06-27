@@ -135,6 +135,15 @@ local globalAppBinds = {
 		end,
 	},
 
+	{
+		key = { "x" },
+		dispatch = function()
+			if recordingMode == 1 then
+				hl.exec_cmd("woomer --output DP-1 --radius 2 --monitor DP-1 -S")
+			end
+		end,
+	},
+
 	-- Logout menu
 	{ key = { "a", "e" }, dispatch = "wlogout -b 5" },
 
