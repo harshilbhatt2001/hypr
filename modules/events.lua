@@ -2,7 +2,7 @@ local appList = {
 	"wpaperd -d",
 	"syncthing -home=/home/user01/.config/syncthing -no-browser",
 	"gotify-desktop",
-	'sleep 5 && curl -X POST -H "Content-Type: application/json" -d "{\\"ref\\":\\"$(git -C ~/.dotfiles rev-parse HEAD)\\", \\"status\\":\\"$(git -C ~/.dotfiles diff --quiet && echo "clean" || echo "dirty")\\"}" https://n8n.voidarc.co.uk/webhook/config-checker',
+	'sleep 5 && curl -X POST -H "Content-Type: application/json" -d "{\\"ref\\":\\"$(git -C ~/.dotfiles rev-parse HEAD)\\", \\"status\\":\\"$(git -C ~/.dotfiles diff --quiet && echo "clean" || echo "dirty")\\"}" https://192.168.1.180:5678/webhook/config-checker',
 }
 
 local localAppList
