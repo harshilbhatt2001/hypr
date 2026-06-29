@@ -65,6 +65,14 @@ hl.window_rule({
 	animation = "slide top",
 })
 
+hl.window_rule({
+	name = "woomer no anim",
+	match = {
+		title = "woomer",
+	},
+	no_anim = true,
+})
+
 -- Define gaps for music workspace
 hl.workspace_rule({
 	workspace = "special:music",
