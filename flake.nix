@@ -26,9 +26,8 @@
     ...
   } @ inputs: let
     system = "x86_64-linux";
-
     pkgs = import nixpkgs {inherit system;};
-    hypr = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    hypr = inputs.hyprland.packages.${system}.default;
     defaultRuntimePkgs = let
       input = {
         package,
@@ -38,20 +37,16 @@
     in {
       inherit
         (pkgs)
-        # Desktop apps
         kitty
         firefox
         nemo
         wlogout
         grimblast
         wpaperd
-        # Autostart
         syncthing
         gotify-desktop
-        # Hackstation
         wayvnc
         quickshell
-        # mobile02
         way-edges
         waybar
         dunst
@@ -60,16 +55,29 @@
       wshowkeys = input {package = "wshowkeys";};
       woomer = input {package = "woomer";};
     };
+
+    mkWrapped = {
+      pkgs,
+      package,
+      runtimePackages,
+      exePath,
+      flags,
+    }:
+      (wrappers.lib.wrapPackage {
+        inherit pkgs package exePath flags;
+        runtimeInputs = builtins.attrValues runtimePackages;
+      }).overrideAttrs (old: {
+        passthru = (old.passthru or {}) // {inherit runtimePackages;};
+      });
   in {
-    lib.defaultRuntimePackages.${pkgs.stdenv.hostPlatform.system} = defaultRuntimePkgs;
-    packages.${pkgs.stdenv.hostPlatform.system}.default = pkgs.lib.makeOverridable wrappers.lib.wrapPackage {
+    lib.defaultRuntimePkgs.${system} = defaultRuntimePkgs;
+
+    packages.${system}.default = pkgs.lib.makeOverridable mkWrapped {
       inherit pkgs;
       package = hypr;
-      runtimeInputs = defaultRuntimePkgs;
+      runtimePackages = defaultRuntimePkgs;
       exePath = pkgs.lib.getExe hypr;
-      flags = {
-        "--config" = ./hyprland.lua;
-      };
+      flags."--config" = ./hyprland.lua;
     };
   };
 }
