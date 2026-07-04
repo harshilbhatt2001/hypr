@@ -63,6 +63,9 @@
       (wrappers.lib.wrapPackage {
         inherit pkgs package exePath flags;
         runtimeInputs = builtins.attrValues runtimePackages;
+        env = {
+          "MODULES_ROOT" = ./.;
+        };
       }).overrideAttrs (old: {
         passthru = (old.passthru or {}) // {inherit runtimePackages;};
       });
