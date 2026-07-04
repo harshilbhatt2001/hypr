@@ -29,44 +29,43 @@
 
     pkgs = import nixpkgs {inherit system;};
     hypr = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    defaultRuntimePkgs = let
+      input = {
+        package,
+        output ? "default",
+      }:
+        inputs.${package}.packages.${system}.${output};
+    in {
+      inherit
+        (pkgs)
+        # Desktop apps
+        kitty
+        firefox
+        nemo
+        wlogout
+        grimblast
+        wpaperd
+        # Autostart
+        syncthing
+        gotify-desktop
+        # Hackstation
+        wayvnc
+        quickshell
+        # mobile02
+        way-edges
+        waybar
+        dunst
+        ;
+      otter-launcher = input {package = "otter-launcher";};
+      wshowkeys = input {package = "wshowkeys";};
+      woomer = input {package = "woomer";};
+    };
   in {
-    packages.${pkgs.stdenv.hostPlatform.system}.default = wrappers.lib.wrapPackage {
+    lib.defaultRuntimePackages.${pkgs.stdenv.hostPlatform.system} = defaultRuntimePkgs;
+    packages.${pkgs.stdenv.hostPlatform.system}.default = pkgs.lib.makeOverridable wrappers.lib.wrapPackage {
       inherit pkgs;
       package = hypr;
-      runtimeInputs = with pkgs;
-        [
-          # Desktop apps
-          kitty
-          firefox
-          nemo
-          wlogout
-          grimblast
-          wpaperd
-
-          # Autostart
-          syncthing
-          gotify-desktop
-
-          # Hackstation
-          wayvnc
-          quickshell
-
-          # mobile02
-          way-edges
-          waybar
-          dunst
-        ]
-        ++ (let
-          input = {
-            package,
-            output ? "default",
-          }:
-            inputs.${package}.packages.${pkgs.stdenv.hostPlatform.system}.${output};
-        in [
-          (input {package = "otter-launcher";})
-          (input {package = "wshowkeys";})
-          (input {package = "woomer";})
-        ]);
+      runtimeInputs = defaultRuntimePkgs;
       exePath = pkgs.lib.getExe hypr;
       flags = {
         "--config" = ./hyprland.lua;
