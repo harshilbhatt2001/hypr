@@ -84,24 +84,6 @@
     },
     "flake-utils": {
       "inputs": {
-        "systems": "systems_3"
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_2": {
-      "inputs": {
         "systems": "systems_4"
       },
       "locked": {
@@ -529,6 +511,22 @@
     },
     "nixpkgs_3": {
       "locked": {
+        "lastModified": 1782175435,
+        "narHash": "sha256-EMzXKmnOtBQ2MnvpiNOm7E+kOMvdPrIKaeg52Tip2Uk=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "89570f24e97e614aa34aa9ab1c927b6578a43775",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_4": {
+      "locked": {
         "lastModified": 1773734432,
         "narHash": "sha256-IF5ppUWh6gHGHYDbtVUyhwy/i7D261P7fWD1bPefOsw=",
         "owner": "NixOS",
@@ -662,28 +660,26 @@
     "woomer": {
       "inputs": {
         "crane": "crane",
-        "flake-utils": "flake-utils",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": "nixpkgs_3",
+        "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1782684443,
-        "narHash": "sha256-a5RnNQoBJ8YEKiwfafWYncSzB7GI6jO5dNiDtRP6tgk=",
-        "owner": "voidarclabs",
+        "lastModified": 1782685056,
+        "narHash": "sha256-WJasTKjf1hcxdCc+jKL3dU5RIL2zdYJ/OBFTmIUbuXc=",
+        "owner": "coffeeispower",
         "repo": "woomer",
-        "rev": "42a60c179e539fe5b4ac8ebdcebbe4056ded9ccd",
+        "rev": "a7a0b288f70b98d168eaa0e8714816d3583c33b1",
         "type": "github"
       },
       "original": {
-        "owner": "voidarclabs",
+        "owner": "coffeeispower",
         "repo": "woomer",
         "type": "github"
       }
     },
     "wrappers": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": "nixpkgs_4"
       },
       "locked": {
         "lastModified": 1782375095,
@@ -701,7 +697,7 @@
     },
     "wshowkeys": {
       "inputs": {
-        "flake-utils": "flake-utils_2",
+        "flake-utils": "flake-utils",
         "nixpkgs": [
           "nixpkgs"
         ]

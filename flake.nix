@@ -13,10 +13,7 @@
       url = "github:voidarclabs/wshowkeys";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    woomer = {
-      url = "github:voidarclabs/woomer";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    woomer.url = "github:coffeeispower/woomer";
   };
 
   outputs = {
