@@ -79,5 +79,11 @@
       exePath = pkgs.lib.getExe hypr;
       flags."--config" = ./hyprland.lua;
     };
+    packages.${system}.minimal = mkWrapped {
+      inherit pkgs;
+      package = hypr;
+      exePath = pkgs.lib.getExe hypr;
+      flags."--config" = ./hyprland.lua;
+    };
   };
 }
