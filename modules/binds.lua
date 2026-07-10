@@ -162,12 +162,26 @@ local globalAppBinds = {
 	{ mod = subMod, key = { "SHIFT + mouse:272" }, dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
 }
 
+-- Check for nixos
+local function is_nixos()
+	local f = io.open("/etc/NIXOS", "r")
+	if f then
+		f:close()
+		return true
+	end
+	return false
+end
+
 -- Workspace switch keys
 for _, bind in ipairs(globalAppBinds) do
 	local modBind = bind.mod or mainMod
 	local command
 	if type(bind.dispatch) ~= "string" then
-		command = bind.dispatch
+		local prepend = ""
+		if is_nixos() then
+			prepend = "/run/hypr-runtime-env/bin/"
+		end
+		command = prepend .. bind.dispatch
 	else
 		command = hl.dsp.exec_cmd(bind.dispatch)
 	end
