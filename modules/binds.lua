@@ -177,13 +177,13 @@ for _, bind in ipairs(globalAppBinds) do
 	local modBind = bind.mod or mainMod
 	local command
 	if type(bind.dispatch) ~= "string" then
+		command = bind.dispatch
+	else
 		local prepend = ""
 		if is_nixos() then
 			prepend = "/run/hypr-runtime-env/bin/"
 		end
-		command = prepend .. bind.dispatch
-	else
-		command = hl.dsp.exec_cmd(bind.dispatch)
+		command = hl.dsp.exec_cmd(prepend .. bind.dispatch)
 	end
 	local opts = {}
 	if bind.opts then
