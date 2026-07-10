@@ -56,7 +56,7 @@ local globalAppBinds = {
 			if hl.get_windows({ class = "otter" })[1] ~= nil then
 				hl.dispatch(hl.dsp.focus({ window = "class:otter" }))
 			else
-				hl.exec_cmd("kitty --class otter --title otter-launcher -e sh -c 'sleep 0.05 && otter-launcher'")
+				hl.exec_cmd("kitty --class otter --title otter-launcher -e sh -c 'sleep 0.05 && /run/hypr-runtime-env/bin/otter-launcher'")
 			end
 		end,
 	},
@@ -179,11 +179,7 @@ for _, bind in ipairs(globalAppBinds) do
 	if type(bind.dispatch) ~= "string" then
 		command = bind.dispatch
 	else
-		local prepend = ""
-		if is_nixos() then
-			prepend = "/run/hypr-runtime-env/bin/"
-		end
-		command = hl.dsp.exec_cmd(prepend .. bind.dispatch)
+		command = hl.dsp.exec_cmd("/run/hypr-runtime-env/bin/" .. bind.dispatch)
 	end
 	local opts = {}
 	if bind.opts then
