@@ -56,7 +56,7 @@ local globalAppBinds = {
 			if hl.get_windows({ class = "otter" })[1] ~= nil then
 				hl.dispatch(hl.dsp.focus({ window = "class:otter" }))
 			else
-				hl.exec_cmd("kitty --class otter --title otter-launcher -e sh -c 'sleep 0.05 && /run/hypr-runtime-env/bin/otter-launcher'")
+				hl.exec_cmd("kitty --class otter --title otter-launcher -e sh -c 'sleep 0.05 && otter-launcher'")
 			end
 		end,
 	},
@@ -162,16 +162,6 @@ local globalAppBinds = {
 	{ mod = subMod, key = { "SHIFT + mouse:272" }, dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
 }
 
--- Check for nixos
-local function is_nixos()
-	local f = io.open("/etc/NIXOS", "r")
-	if f then
-		f:close()
-		return true
-	end
-	return false
-end
-
 -- Workspace switch keys
 for _, bind in ipairs(globalAppBinds) do
 	local modBind = bind.mod or mainMod
@@ -179,7 +169,7 @@ for _, bind in ipairs(globalAppBinds) do
 	if type(bind.dispatch) ~= "string" then
 		command = bind.dispatch
 	else
-		command = hl.dsp.exec_cmd("/run/hypr-runtime-env/bin/" .. bind.dispatch)
+		command = hl.dsp.exec_cmd(bind.dispatch)
 	end
 	local opts = {}
 	if bind.opts then
