@@ -1,3 +1,4 @@
+hl.env("PATH", "/run/hypr-runtime-env/bin:" .. os.getenv("PATH"))
 -- Get hostname from envvars or something
 local handle = io.popen("hostname")
 Hostname = "unknown" -- Default fallback
