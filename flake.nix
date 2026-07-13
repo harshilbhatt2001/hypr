@@ -59,10 +59,10 @@
       runtimePackages,
       exePath,
       flags,
+			env,
     }:
       (wrappers.lib.wrapPackage {
-        inherit pkgs package exePath flags;
-        env = {"MODULES_ROOT" = ./.;};
+        inherit env pkgs package exePath flags;
       }).overrideAttrs (old: {
         passthru = (old.passthru or {}) // {inherit runtimePackages;};
       });
@@ -74,6 +74,7 @@
       package = hypr;
       runtimePackages = defaultRuntimePkgs;
       exePath = pkgs.lib.getExe hypr;
+      env."MODULES_ROOT" = ./modules;
       flags."--config" = ./hyprland.lua;
     };
   };

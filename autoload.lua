@@ -1,8 +1,13 @@
 -- ~/.config/hypr/autoload.lua
 
 -- Path to search
--- local modules = os.getenv("HOME") .. "/.config/hypr/modules"
-local modules = os.getenv("MODULES_ROOT") .. "/modules"
+local modules
+
+if os.getenv("MODULES_ROOT") then
+	modules = os.getenv("MODULES_ROOT")
+else
+	modules = os.getenv("HOME") .. "/.config/hypr/modules"
+end
 
 -- Get all files in modules dir
 local p = io.popen('find -L "' .. modules .. '" -name "*.lua" -type f | sort')
