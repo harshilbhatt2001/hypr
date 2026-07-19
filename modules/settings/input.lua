@@ -30,4 +30,14 @@ if Hostname == "mobile02" then
 			kb_options = "caps:escape_shifted_capslock",
 		},
 	})
+elseif Hostname == "HACKSTATION" then
+	hl.device({
+		name = "weylus-stylus",
+		left_handed = false,
+		output = "DP-1"
+	})
+	hl.device({
+		name = "weylus-touch",
+		output = "DP-1"
+	})
 end
