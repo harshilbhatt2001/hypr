@@ -59,23 +59,42 @@
       runtimePackages,
       exePath,
       flags,
-			env,
+      env,
     }:
       (wrappers.lib.wrapPackage {
         inherit env pkgs package exePath flags;
       }).overrideAttrs (old: {
         passthru = (old.passthru or {}) // {inherit runtimePackages;};
       });
+    repoSrc = pkgs.lib.cleanSourceWith {
+      src = ./.;
+      filter = path: type: let
+        name = baseNameOf path;
+      in
+        !(name == ".git" || name == ".gitignore" || name == "result" || name == ".direnv");
+    };
   in {
     lib.defaultRuntimePkgs.${system} = defaultRuntimePkgs;
 
-    packages.${system}.default = pkgs.lib.makeOverridable mkWrapped {
-      inherit pkgs;
-      package = hypr;
-      runtimePackages = defaultRuntimePkgs;
-      exePath = pkgs.lib.getExe hypr;
-      env."MODULES_ROOT" = ./modules;
-      flags."--config" = ./hyprland.lua;
+    packages.${system} = {
+      default = pkgs.lib.makeOverridable mkWrapped {
+        inherit pkgs;
+        package = hypr;
+        runtimePackages = defaultRuntimePkgs;
+        exePath = pkgs.lib.getExe hypr;
+        env."MODULES_ROOT" = ./modules;
+        flags."--config" = ./hyprland.lua;
+      };
+      repo-files = pkgs.stdenvNoCC.mkDerivation {
+        pname = "hyprland-repo-files";
+        version = "1.0";
+        src = repoSrc;
+        dontBuild = true;
+        installPhase = ''
+          mkdir -p $out
+          cp -r . $out/
+        '';
+      };
     };
   };
 }
