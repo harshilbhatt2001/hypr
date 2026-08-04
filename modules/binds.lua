@@ -180,6 +180,15 @@ for _, bind in ipairs(globalAppBinds) do
 	else
 		hl.bind(modBind .. bind.key[1], command)
 	end
+	-- If not on hackstation
+	-- Bind all keys for corne if it connects because theres no number row
+	if keybindIndex ~= 1 then
+		hl.bind(
+			"SUPER + " .. bind.key[1],
+			command,
+			{ device = { inclusive = true, list = { "zmk-project-corne-keyboard" } } }
+		)
+	end
 end
 
 -- Workspace functions
