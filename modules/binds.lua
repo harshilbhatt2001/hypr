@@ -26,10 +26,12 @@ local function notif(text, timeout, icon)
 	})
 end
 
+local corneKeyboardString = "qwertyuiop"
+
 -- Set modifier keys
 local mainMod = "SUPER + "
 local subMod = mainMod
-local keyboardString = "qwertyuiop"
+local keyboardString = corneKeyboardString
 local keybindIndex = 1
 local recordingMode = 0
 
@@ -201,4 +203,26 @@ end
 for index, bind in ipairs(keyboardSplit) do
 	hl.bind(mainMod .. bind, hl.dsp.focus({ workspace = index }))
 	hl.bind(mainMod .. "SHIFT + " .. bind, hl.dsp.window.move({ workspace = index, follow = false }))
+end
+
+-- Workspace binds for corne in particular
+if Hostname ~= "HACKSTATION" then
+	local corneKeyboardSplit = {}
+
+	for char in corneKeyboardString:gmatch(".") do
+		table.insert(corneKeyboardSplit, char)
+	end
+
+	for index, bind in ipairs(corneKeyboardSplit) do
+		hl.bind(
+			"SUPER +" .. bind,
+			hl.dsp.focus({ workspace = index }),
+			{ inclusive = true, list = { "zmk-project-corne-keyboard" } }
+		)
+		hl.bind(
+			"SUPER +" .. "SHIFT + " .. bind,
+			hl.dsp.window.move({ workspace = index, follow = false }),
+			{ inclusive = true, list = { "zmk-project-corne-keyboard" } }
+		)
+	end
 end
