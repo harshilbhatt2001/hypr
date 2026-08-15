@@ -1,8 +1,5 @@
 -- Size for otter launcher
 local otterSize = { 410, 220 }
-if Hostname == "mobile02" then
-	otterSize = { 420, 220 }
-end
 hl.window_rule({
 	name = "otter-launcher",
 	match = {
@@ -58,14 +55,6 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	name = "jelly slide",
-	match = {
-		class = "^(jf-tui)$",
-	},
-	animation = "slide top",
-})
-
-hl.window_rule({
 	name = "woomer no anim",
 	match = {
 		title = "woomer",
@@ -82,15 +71,6 @@ hl.workspace_rule({
 		bottom = 400,
 	},
 	animation = "slidefadevert",
-})
-
--- Something from the example idk
-hl.window_rule({
-	name = "move-hyprland-run",
-	match = { class = "hyprland-run" },
-
-	move = "20 monitor_h-120",
-	float = true,
 })
 
 -- Fix some dragging issues with XWayland
@@ -134,15 +114,6 @@ hl.layer_rule({
 		namespace = "waybar",
 	},
 	blur = true,
-	ignore_alpha = 0,
-})
-
-hl.layer_rule({
-	name = "astal",
-	match = {
-		namespace = "system-stats",
-	},
-	blur = false,
 	ignore_alpha = 0,
 })
 
