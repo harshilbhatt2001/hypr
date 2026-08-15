@@ -19,17 +19,52 @@ end
 -- Set modifier keys
 local mainMod = "SUPER + "
 local subMod = mainMod
-local keyboardString = "qwertyuiop"
 local recordingMode = 0
 
+-- Column focus with monitor fallback (shared by h/l and arrow keys)
+local function focus_column_right()
+	-- Move before so you can detect if it is the last window
+	hl.dispatch(hl.dsp.layout("move +col"))
+	if not normalise_current_window_pos() then
+		-- Go back a window
+		hl.dispatch(hl.dsp.layout("move -col"))
+		-- Move to monitor to the right
+		hl.dispatch(hl.dsp.focus({ monitor = "right" }))
+	end
+end
+
+local function focus_column_left()
+	local pos = normalise_current_window_pos()
+	if pos then
+		-- 9 derived from 5 gap plus 3 border (8), so first pixel of window is 9
+		if pos == 9 then
+			-- If first window, then move to monitor to the left
+			hl.dispatch(hl.dsp.focus({ monitor = "left" }))
+		else
+			-- If not the first window then go to the column to the left
+			hl.dispatch(hl.dsp.layout("move -col"))
+		end
+	end
+end
+
+-- Keybinds mirror the niri config (features/niri in the nixos repo):
+-- Q close, W browser, F maximize, Shift+F fullscreen, V float,
+-- Shift+E quit, numbers for workspaces, U/I workspace down/up.
 local globalAppBinds = {
 
 	---- Window functions
+	{ key = "q", dispatch = hl.dsp.window.close() },
 	{ key = "BACKSPACE", dispatch = hl.dsp.window.close() },
-	{ key = "b", dispatch = hl.dsp.window.fullscreen({ action = "toggle" }) },
+	{ key = "f", dispatch = hl.dsp.window.fullscreen({ action = "toggle", mode = "maximized" }) },
+	{ key = "SHIFT + f", dispatch = hl.dsp.window.fullscreen({ action = "toggle" }) },
+	{ key = "v", dispatch = hl.dsp.window.float() },
 	{ mod = subMod, key = "space", dispatch = hl.dsp.window.float() },
+	{ key = "SHIFT + e", dispatch = hl.dsp.exit() },
 
 	---- Apps
+	-- Browser
+	{ key = "w", dispatch = "zen" },
+
 	-- Launcher
 	{
 		key = "d",
@@ -54,44 +89,30 @@ local globalAppBinds = {
 		end,
 	},
 
-	-- Firefox and file browser
-	{ key = "f", dispatch = "firefox" },
+	-- File browser
 	{ key = "s", dispatch = "nemo" },
 
-	---- Move windows
+	---- Focus
 	{ key = "k", dispatch = hl.dsp.focus({ direction = "up" }) },
 	{ key = "j", dispatch = hl.dsp.focus({ direction = "down" }) },
+	{ key = "UP", dispatch = hl.dsp.focus({ direction = "up" }) },
+	{ key = "DOWN", dispatch = hl.dsp.focus({ direction = "down" }) },
+	{ key = "l", dispatch = focus_column_right },
+	{ key = "h", dispatch = focus_column_left },
+	{ key = "RIGHT", dispatch = focus_column_right },
+	{ key = "LEFT", dispatch = focus_column_left },
+
+	---- Move columns (niri uses Ctrl; Shift kept from the old scheme)
 	{ key = "SHIFT + h", dispatch = hl.dsp.layout("swapcol l") },
 	{ key = "SHIFT + l", dispatch = hl.dsp.layout("swapcol r") },
-	{
-		key = "l",
-		dispatch = function()
-			-- Move before so you can detect if it is the last window
-			hl.dispatch(hl.dsp.layout("move +col"))
-			if not normalise_current_window_pos() then
-				-- Go back a window
-				hl.dispatch(hl.dsp.layout("move -col"))
-				-- Move to monitor to the right
-				hl.dispatch(hl.dsp.focus({ monitor = "right" }))
-			end
-		end,
-	},
-	{
-		key = "h",
-		dispatch = function()
-			local pos = normalise_current_window_pos()
-			if pos then
-				-- 9 derived from 5 gap plus 3 border (8), so first pixel of window is 9
-				if pos == 9 then
-					-- If first window, then move to monitor to the left
-					hl.dispatch(hl.dsp.focus({ monitor = "left" }))
-				else
-					-- If not the first window then go to the column to the left
-					hl.dispatch(hl.dsp.layout("move -col"))
-				end
-			end
-		end,
-	},
+	{ key = "CTRL + h", dispatch = hl.dsp.layout("swapcol l") },
+	{ key = "CTRL + l", dispatch = hl.dsp.layout("swapcol r") },
+
+	---- Workspaces up/down (niri Mod+U/I)
+	{ key = "u", dispatch = hl.dsp.focus({ workspace = "e+1" }) },
+	{ key = "i", dispatch = hl.dsp.focus({ workspace = "e-1" }) },
+	{ key = "CTRL + u", dispatch = hl.dsp.window.move({ workspace = "e+1", follow = true }) },
+	{ key = "CTRL + i", dispatch = hl.dsp.window.move({ workspace = "e-1", follow = true }) },
 
 	---- Special Workspaces
 	{ key = "m", dispatch = hl.dsp.workspace.toggle_special("music") },
@@ -154,9 +175,21 @@ for _, bind in ipairs(globalAppBinds) do
 	hl.bind(modBind .. bind.key, command, bind.opts or {})
 end
 
--- Workspace binds: SUPER + <row key> focuses, + SHIFT moves the window there
-for index = 1, #keyboardString do
-	local bind = keyboardString:sub(index, index)
-	hl.bind(mainMod .. bind, hl.dsp.focus({ workspace = index }))
-	hl.bind(mainMod .. "SHIFT + " .. bind, hl.dsp.window.move({ workspace = index, follow = false }))
+-- Workspaces on numbers like niri: SUPER+n focuses, +CTRL (niri) or
+-- +SHIFT moves the window there
+for index = 1, 9 do
+	local key = tostring(index)
+	hl.bind(mainMod .. key, hl.dsp.focus({ workspace = index }))
+	hl.bind(mainMod .. "CTRL + " .. key, hl.dsp.window.move({ workspace = index, follow = false }))
+	hl.bind(mainMod .. "SHIFT + " .. key, hl.dsp.window.move({ workspace = index, follow = false }))
 end
+
+-- Screenshots without SUPER, like niri's Print family
+hl.bind("PRINT", hl.dsp.exec_cmd("grimblast copy area"))
+hl.bind("CTRL + PRINT", hl.dsp.exec_cmd("grimblast copy output"))
+hl.bind("ALT + PRINT", hl.dsp.exec_cmd("grimblast copy active"))
+
+-- Media keys, usable on the lock screen
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
