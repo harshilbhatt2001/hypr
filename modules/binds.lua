@@ -162,6 +162,7 @@ local globalAppBinds = {
 		opts = { mouse = true, release = true },
 	},
 	{ mod = subMod, key = "SHIFT + mouse:272", dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
+	{ mod = subMod, key = "mouse:273", dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
 }
 
 for _, bind in ipairs(globalAppBinds) do
@@ -193,3 +194,11 @@ hl.bind("ALT + PRINT", hl.dsp.exec_cmd("grimblast copy active"))
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
+
+-- Playback keys (need playerctl installed)
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+hl.bind("XF86AudioStop", hl.dsp.exec_cmd("playerctl stop"), { locked = true })
