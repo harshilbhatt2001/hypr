@@ -21,6 +21,20 @@ local mainMod = "SUPER + "
 local subMod = mainMod
 local recordingMode = 0
 
+-- Keybinding overview: every bind below carries a desc; they are collected
+-- here and written to a text file on config (re)load. SUPER + \ shows it.
+local overviewPath = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/hypr-binds-overview.txt"
+local overviewLines = { "Keybindings (SUPER = Windows key)  —  q closes this window" }
+
+local function note(combo, desc)
+	table.insert(overviewLines, string.format("  %-26s %s", combo, desc))
+end
+
+local function section(title)
+	table.insert(overviewLines, "")
+	table.insert(overviewLines, title)
+end
+
 -- Column focus with monitor fallback (shared by h/l and arrow keys)
 local function focus_column_right()
 	-- Move before so you can detect if it is the last window
@@ -50,24 +64,29 @@ end
 -- Keybinds mirror the niri config (features/niri in the nixos repo):
 -- Q close, W browser, F maximize, Shift+F fullscreen, V float,
 -- Shift+E quit, numbers for workspaces, U/I workspace down/up.
+-- Entries with `header` only mark sections in the overview.
 local globalAppBinds = {
 
-	---- Window functions
-	{ key = "q", dispatch = hl.dsp.window.close() },
-	{ key = "BACKSPACE", dispatch = hl.dsp.window.close() },
-	{ key = "f", dispatch = hl.dsp.window.fullscreen({ action = "toggle", mode = "maximized" }) },
-	{ key = "SHIFT + f", dispatch = hl.dsp.window.fullscreen({ action = "toggle" }) },
-	{ key = "v", dispatch = hl.dsp.window.float() },
-	{ mod = subMod, key = "space", dispatch = hl.dsp.window.float() },
-	{ key = "SHIFT + e", dispatch = hl.dsp.exit() },
+	{ header = "Windows" },
+	{ key = "q", desc = "close window", dispatch = hl.dsp.window.close() },
+	{
+		key = "f",
+		desc = "maximize window",
+		dispatch = hl.dsp.window.fullscreen({ action = "toggle", mode = "maximized" }),
+	},
+	{ key = "SHIFT + f", desc = "fullscreen window", dispatch = hl.dsp.window.fullscreen({ action = "toggle" }) },
+	{ key = "v", desc = "toggle floating", dispatch = hl.dsp.window.float() },
+	{ mod = subMod, key = "space", desc = "toggle floating", dispatch = hl.dsp.window.float() },
+	{ key = "SHIFT + e", desc = "exit hyprland", dispatch = hl.dsp.exit() },
 
-	---- Apps
+	{ header = "Apps" },
 	-- Browser
-	{ key = "w", dispatch = "zen" },
+	{ key = "w", desc = "browser (zen)", dispatch = "zen" },
 
 	-- Launcher
 	{
 		key = "d",
+		desc = "app launcher (otter)",
 		dispatch = function()
 			if hl.get_windows({ class = "otter" })[1] ~= nil then
 				hl.dispatch(hl.dsp.focus({ window = "class:otter" }))
@@ -80,6 +99,7 @@ local globalAppBinds = {
 	-- Terminal
 	{
 		key = "RETURN",
+		desc = "terminal (kitty)",
 		dispatch = function()
 			if recordingMode == 1 then
 				hl.exec_cmd("kitty -o font_size=24 -o window_margin_width=20")
@@ -90,38 +110,71 @@ local globalAppBinds = {
 	},
 
 	-- File browser
-	{ key = "s", dispatch = "nemo" },
+	{ key = "s", desc = "file browser (nemo)", dispatch = "nemo" },
 
-	---- Focus
-	{ key = "k", dispatch = hl.dsp.focus({ direction = "up" }) },
-	{ key = "j", dispatch = hl.dsp.focus({ direction = "down" }) },
-	{ key = "UP", dispatch = hl.dsp.focus({ direction = "up" }) },
-	{ key = "DOWN", dispatch = hl.dsp.focus({ direction = "down" }) },
-	{ key = "l", dispatch = focus_column_right },
-	{ key = "h", dispatch = focus_column_left },
-	{ key = "RIGHT", dispatch = focus_column_right },
-	{ key = "LEFT", dispatch = focus_column_left },
+	-- Power menu
+	{ key = "BACKSPACE", desc = "power menu (lock/logout/shutdown/reboot)", dispatch = "wlogout" },
+	{ key = "a", desc = "power menu (lock/logout/shutdown/reboot)", dispatch = "wlogout" },
 
-	---- Move columns (niri uses Ctrl; Shift kept from the old scheme)
-	{ key = "SHIFT + h", dispatch = hl.dsp.layout("swapcol l") },
-	{ key = "SHIFT + l", dispatch = hl.dsp.layout("swapcol r") },
-	{ key = "CTRL + h", dispatch = hl.dsp.layout("swapcol l") },
-	{ key = "CTRL + l", dispatch = hl.dsp.layout("swapcol r") },
+	-- This overview
+	{
+		key = "backslash",
+		desc = "show this keybinding overview",
+		dispatch = function()
+			if hl.get_windows({ class = "hypr-binds" })[1] ~= nil then
+				hl.dispatch(hl.dsp.focus({ window = "class:hypr-binds" }))
+			else
+				hl.exec_cmd("kitty --class hypr-binds --title keybindings -e less -M " .. overviewPath)
+			end
+		end,
+	},
 
-	---- Workspaces up/down (niri Mod+U/I)
-	{ key = "u", dispatch = hl.dsp.focus({ workspace = "e+1" }) },
-	{ key = "i", dispatch = hl.dsp.focus({ workspace = "e-1" }) },
-	{ key = "CTRL + u", dispatch = hl.dsp.window.move({ workspace = "e+1", follow = true }) },
-	{ key = "CTRL + i", dispatch = hl.dsp.window.move({ workspace = "e-1", follow = true }) },
+	{ header = "Focus" },
+	{ key = "k", desc = "focus up", dispatch = hl.dsp.focus({ direction = "up" }) },
+	{ key = "j", desc = "focus down", dispatch = hl.dsp.focus({ direction = "down" }) },
+	{ key = "UP", desc = "focus up", dispatch = hl.dsp.focus({ direction = "up" }) },
+	{ key = "DOWN", desc = "focus down", dispatch = hl.dsp.focus({ direction = "down" }) },
+	{ key = "l", desc = "focus column right (or next monitor)", dispatch = focus_column_right },
+	{ key = "h", desc = "focus column left (or previous monitor)", dispatch = focus_column_left },
+	{ key = "RIGHT", desc = "focus column right (or next monitor)", dispatch = focus_column_right },
+	{ key = "LEFT", desc = "focus column left (or previous monitor)", dispatch = focus_column_left },
+
+	{ header = "Move columns" },
+	---- (niri uses Ctrl; Shift kept from the old scheme)
+	{ key = "SHIFT + h", desc = "swap column left", dispatch = hl.dsp.layout("swapcol l") },
+	{ key = "SHIFT + l", desc = "swap column right", dispatch = hl.dsp.layout("swapcol r") },
+	{ key = "CTRL + h", desc = "swap column left", dispatch = hl.dsp.layout("swapcol l") },
+	{ key = "CTRL + l", desc = "swap column right", dispatch = hl.dsp.layout("swapcol r") },
+
+	{ header = "Workspaces" },
+	---- up/down (niri Mod+U/I)
+	{ key = "u", desc = "next workspace", dispatch = hl.dsp.focus({ workspace = "e+1" }) },
+	{ key = "i", desc = "previous workspace", dispatch = hl.dsp.focus({ workspace = "e-1" }) },
+	{
+		key = "CTRL + u",
+		desc = "move window to next workspace",
+		dispatch = hl.dsp.window.move({ workspace = "e+1", follow = true }),
+	},
+	{
+		key = "CTRL + i",
+		desc = "move window to previous workspace",
+		dispatch = hl.dsp.window.move({ workspace = "e-1", follow = true }),
+	},
 
 	---- Special Workspaces
-	{ key = "m", dispatch = hl.dsp.workspace.toggle_special("music") },
-	{ key = "minus", dispatch = hl.dsp.workspace.toggle_special("scratch") },
-	{ key = "SHIFT + minus", dispatch = hl.dsp.window.move({ workspace = "special:scratch", follow = false }) },
+	{ key = "m", desc = "toggle music workspace", dispatch = hl.dsp.workspace.toggle_special("music") },
+	{ key = "minus", desc = "toggle scratchpad", dispatch = hl.dsp.workspace.toggle_special("scratch") },
+	{
+		key = "SHIFT + minus",
+		desc = "move window to scratchpad",
+		dispatch = hl.dsp.window.move({ workspace = "special:scratch", follow = false }),
+	},
 
+	{ header = "Recording" },
 	-- Youtuber mode lol
 	{
 		key = "z",
+		desc = "toggle recording mode (wshowkeys)",
 		dispatch = function()
 			if recordingMode == 0 then
 				recordingMode = 1
@@ -139,6 +192,7 @@ local globalAppBinds = {
 
 	{
 		key = "x",
+		desc = "zoom (woomer, recording mode only)",
 		dispatch = function()
 			if recordingMode == 1 then
 				hl.exec_cmd("woomer --output HDMI-A-2 --radius 2 --monitor HDMI-A-2 -S")
@@ -146,34 +200,62 @@ local globalAppBinds = {
 		end,
 	},
 
-	-- Logout menu
-	{ key = "a", dispatch = "wlogout -b 5" },
+	{ header = "Screenshots" },
+	{ mod = subMod, key = "SHIFT + s", desc = "screenshot area to clipboard", dispatch = "grimblast copy area" },
 
-	-- Screenshot
-	{ mod = subMod, key = "SHIFT + s", dispatch = "grimblast copy area" },
-
-	-- Mouse for moving windows
-	{ mod = subMod, key = "mouse:272", dispatch = hl.dsp.window.drag(), opts = { mouse = true } },
-	{ mod = subMod, key = "mouse:272", dispatch = hl.dsp.window.float(), opts = { mouse = true, click = true } },
+	{ header = "Mouse" },
+	{
+		mod = subMod,
+		key = "mouse:272",
+		desc = "drag to move window (left button)",
+		dispatch = hl.dsp.window.drag(),
+		opts = { mouse = true },
+	},
+	{
+		mod = subMod,
+		key = "mouse:272",
+		desc = "click to float window (left button)",
+		dispatch = hl.dsp.window.float(),
+		opts = { mouse = true, click = true },
+	},
 	{
 		mod = subMod,
 		key = "mouse:272",
 		dispatch = hl.dsp.layout("promote"),
 		opts = { mouse = true, release = true },
 	},
-	{ mod = subMod, key = "SHIFT + mouse:272", dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
-	{ mod = subMod, key = "mouse:273", dispatch = hl.dsp.window.resize(), opts = { mouse = true } },
+	{
+		mod = subMod,
+		key = "SHIFT + mouse:272",
+		desc = "drag to resize window (left button)",
+		dispatch = hl.dsp.window.resize(),
+		opts = { mouse = true },
+	},
+	{
+		mod = subMod,
+		key = "mouse:273",
+		desc = "drag to resize window (right button)",
+		dispatch = hl.dsp.window.resize(),
+		opts = { mouse = true },
+	},
 }
 
 for _, bind in ipairs(globalAppBinds) do
-	local modBind = bind.mod or mainMod
-	local command
-	if type(bind.dispatch) ~= "string" then
-		command = bind.dispatch
+	if bind.header then
+		section(bind.header)
 	else
-		command = hl.dsp.exec_cmd(bind.dispatch)
+		local modBind = bind.mod or mainMod
+		local command
+		if type(bind.dispatch) ~= "string" then
+			command = bind.dispatch
+		else
+			command = hl.dsp.exec_cmd(bind.dispatch)
+		end
+		hl.bind(modBind .. bind.key, command, bind.opts or {})
+		if bind.desc then
+			note(modBind .. bind.key, bind.desc)
+		end
 	end
-	hl.bind(modBind .. bind.key, command, bind.opts or {})
 end
 
 -- Workspaces on numbers like niri: SUPER+n focuses, +CTRL (niri) or
@@ -184,11 +266,17 @@ for index = 1, 9 do
 	hl.bind(mainMod .. "CTRL + " .. key, hl.dsp.window.move({ workspace = index, follow = false }))
 	hl.bind(mainMod .. "SHIFT + " .. key, hl.dsp.window.move({ workspace = index, follow = false }))
 end
+note(mainMod .. "1..9", "focus workspace n")
+note(mainMod .. "CTRL/SHIFT + 1..9", "move window to workspace n")
 
 -- Screenshots without SUPER, like niri's Print family
+section("Screenshots (no SUPER)")
 hl.bind("PRINT", hl.dsp.exec_cmd("grimblast copy area"))
+note("PRINT", "screenshot area to clipboard")
 hl.bind("CTRL + PRINT", hl.dsp.exec_cmd("grimblast copy output"))
+note("CTRL + PRINT", "screenshot monitor to clipboard")
 hl.bind("ALT + PRINT", hl.dsp.exec_cmd("grimblast copy active"))
+note("ALT + PRINT", "screenshot window to clipboard")
 
 -- Media keys, usable on the lock screen
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true })
@@ -202,3 +290,12 @@ hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tr
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 hl.bind("XF86AudioStop", hl.dsp.exec_cmd("playerctl stop"), { locked = true })
+section("Media keys (work on the lock screen)")
+note("XF86Audio*", "volume, mute, playback via wpctl/playerctl")
+
+-- Write the overview for SUPER + \ to display
+local overviewFile = io.open(overviewPath, "w")
+if overviewFile then
+	overviewFile:write(table.concat(overviewLines, "\n") .. "\n")
+	overviewFile:close()
+end

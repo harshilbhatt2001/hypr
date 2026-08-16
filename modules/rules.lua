@@ -15,7 +15,7 @@ hl.window_rule({
 hl.window_rule({
 	name = "nodim-youtube",
 	match = {
-		class = "^(firefox|Firefox)$",
+		class = "^(zen)$",
 		title = "^(.*YouTube.*)$",
 	},
 	no_dim = true,
@@ -26,7 +26,7 @@ hl.window_rule({
 local standardFloatingWindows = {
 	{ class = "xdg-desktop-portal-gtk" },
 	{ class = "org.pulseaudio.pavucontrol" },
-	{ class = "firefox", title = ".*Save.*" },
+	{ class = "zen", title = ".*Save.*" },
 }
 
 -- For every window that floats make a rule
