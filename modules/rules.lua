@@ -29,6 +29,36 @@ local standardFloatingWindows = {
 	{ class = "zen", title = ".*Save.*" },
 }
 
+-- SUPER + \ keybinding overview: centered float. Sizes are in logical px,
+-- which at native scale equals physical px on the 2560x1440 monitor; center
+-- is applied after size and respects reserved areas (the bar).
+hl.window_rule({
+	name = "binds-overview",
+	match = {
+		class = "hypr-binds",
+	},
+	float = true,
+	size = { 1200, 900 },
+	center = true,
+	animation = "popin 80%",
+	opaque = true,
+})
+
+-- SUPER + SHIFT + RETURN scratchpad terminal: lives on special:term so the
+-- same instance follows across workspaces; centered float
+hl.window_rule({
+	name = "scratchpad-terminal",
+	match = {
+		class = "scratchterm",
+	},
+	workspace = "special:term",
+	float = true,
+	size = { 1920, 1080 },
+	center = true,
+	animation = "popin 80%",
+	opaque = true,
+})
+
 -- For every window that floats make a rule
 for _, window in ipairs(standardFloatingWindows) do
 	hl.window_rule({

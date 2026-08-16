@@ -109,6 +109,19 @@ local globalAppBinds = {
 		end,
 	},
 
+	-- Scratchpad terminal: one persistent kitty on special:term, toggled
+	-- from any workspace (window rule in rules.lua sends it there)
+	{
+		key = "SHIFT + RETURN",
+		desc = "toggle scratchpad terminal",
+		dispatch = function()
+			if hl.get_windows({ class = "scratchterm" })[1] == nil then
+				hl.exec_cmd("kitty --class scratchterm")
+			end
+			hl.dispatch(hl.dsp.workspace.toggle_special("term"))
+		end,
+	},
+
 	-- File browser
 	{ key = "s", desc = "file browser (nemo)", dispatch = "nemo" },
 
