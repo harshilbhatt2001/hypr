@@ -1,9 +1,9 @@
--- Single AOC Q27P2G5 1440p over HDMI
+-- Single AOC Q27P2G5 1440p over HDMI, native (unscaled)
 hl.monitor({
 	output = "HDMI-A-2",
 	position = "0x0",
 	mode = "2560x1440@60",
-	scale = "1.2",
+	scale = "1",
 })
 
 -- Fallback for anything hotplugged
