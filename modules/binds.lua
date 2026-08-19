@@ -16,6 +16,9 @@ local function notif(text, timeout, icon)
 	})
 end
 
+-- Class/workspace of the opencode overlay; its window rule is in rules.lua
+local overlay = require("modules.opencode-overlay")
+
 -- Set modifier keys
 local mainMod = "SUPER + "
 local subMod = mainMod
@@ -122,6 +125,22 @@ local globalAppBinds = {
 		end,
 	},
 
+	-- Quake-style opencode overlay: a full-width sheet at the top of the screen.
+	-- Toggling only shows/hides its special workspace, so the opencode session
+	-- is never killed; the first press spawns it and drops it down.
+	-- `-o` overrides the wrapped kitty's padding for this instance only, so the
+	-- TUI sits flush in the sheet while normal terminals keep their padding.
+	{
+		key = "backslash",
+		desc = "toggle opencode overlay",
+		dispatch = function()
+			if hl.get_windows({ class = overlay.class })[1] == nil then
+				hl.exec_cmd("kitty -o window_padding_width=0 --class " .. overlay.class .. " -e opencode")
+			end
+			hl.dispatch(hl.dsp.workspace.toggle_special(overlay.workspace))
+		end,
+	},
+
 	-- File browser
 	{ key = "s", desc = "file browser (nemo)", dispatch = "nemo" },
 
@@ -131,7 +150,7 @@ local globalAppBinds = {
 
 	-- This overview
 	{
-		key = "backslash",
+		key = "SHIFT + backslash",
 		desc = "show this keybinding overview",
 		dispatch = function()
 			if hl.get_windows({ class = "hypr-binds" })[1] ~= nil then
