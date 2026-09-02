@@ -63,50 +63,28 @@ local function focus_column_left()
 	end
 end
 
--- Keybinds mirror the niri config (features/niri in the nixos repo):
--- Q close, W browser, F maximize, Shift+F fullscreen, V float,
--- Shift+E quit, numbers for workspaces, U/I workspace down/up.
+-- App launcher (otter in a kitty window); bound via the shared keymap's
+-- `launcher` action below
+local function launcher_toggle()
+	if hl.get_windows({ class = "otter" })[1] ~= nil then
+		hl.dispatch(hl.dsp.focus({ window = "class:otter" }))
+	else
+		hl.exec_cmd("kitty --class otter --title otter-launcher -e sh -c 'sleep 0.05 && otter-launcher'")
+	end
+end
+
+-- Hyprland-only binds. Everything both compositors share (close/maximize/
+-- fullscreen/float/quit, terminal/browser/launcher, focus and move, numbered
+-- and next/prev workspaces, screenshots, media keys, thumb wheel) comes from
+-- the shared keymap loaded at the bottom of this file — add such binds in
+-- modules/features/keymap in the nixos repo, not here.
 -- Entries with `header` only mark sections in the overview.
 local globalAppBinds = {
 
 	{ header = "Windows" },
-	{ key = "q", desc = "close window", dispatch = hl.dsp.window.close() },
-	{
-		key = "f",
-		desc = "maximize window",
-		dispatch = hl.dsp.window.fullscreen({ action = "toggle", mode = "maximized" }),
-	},
-	{ key = "SHIFT + f", desc = "fullscreen window", dispatch = hl.dsp.window.fullscreen({ action = "toggle" }) },
-	{ key = "v", desc = "toggle floating", dispatch = hl.dsp.window.float() },
 	{ mod = subMod, key = "space", desc = "toggle floating", dispatch = hl.dsp.window.float() },
-	{ key = "SHIFT + e", desc = "exit hyprland", dispatch = hl.dsp.exit() },
 
 	{ header = "Apps" },
-	-- Browser
-	{ key = "w", desc = "browser (zen)", dispatch = "zen" },
-
-	-- Launcher
-	{
-		key = "d",
-		desc = "app launcher (otter)",
-		dispatch = function()
-			if hl.get_windows({ class = "otter" })[1] ~= nil then
-				hl.dispatch(hl.dsp.focus({ window = "class:otter" }))
-			else
-				hl.exec_cmd("kitty --class otter --title otter-launcher -e sh -c 'sleep 0.05 && otter-launcher'")
-			end
-		end,
-	},
-
-	-- Terminal
-	{
-		key = "RETURN",
-		desc = "terminal (kitty)",
-		dispatch = function()
-			hl.exec_cmd("kitty")
-		end,
-	},
-
 	-- Scratchpad terminal: one persistent kitty on special:term, toggled
 	-- from any workspace (window rule in rules.lua sends it there)
 	{
@@ -156,38 +134,12 @@ local globalAppBinds = {
 		end,
 	},
 
-	{ header = "Focus" },
-	{ key = "k", desc = "focus up", dispatch = hl.dsp.focus({ direction = "up" }) },
-	{ key = "j", desc = "focus down", dispatch = hl.dsp.focus({ direction = "down" }) },
-	{ key = "UP", desc = "focus up", dispatch = hl.dsp.focus({ direction = "up" }) },
-	{ key = "DOWN", desc = "focus down", dispatch = hl.dsp.focus({ direction = "down" }) },
-	{ key = "l", desc = "focus column right (or next monitor)", dispatch = focus_column_right },
-	{ key = "h", desc = "focus column left (or previous monitor)", dispatch = focus_column_left },
-	{ key = "RIGHT", desc = "focus column right (or next monitor)", dispatch = focus_column_right },
-	{ key = "LEFT", desc = "focus column left (or previous monitor)", dispatch = focus_column_left },
-
 	{ header = "Move columns" },
-	---- (niri uses Ctrl; Shift kept from the old scheme)
+	---- Shift variants kept from the old scheme (the shared keymap has Ctrl)
 	{ key = "SHIFT + h", desc = "swap column left", dispatch = hl.dsp.layout("swapcol l") },
 	{ key = "SHIFT + l", desc = "swap column right", dispatch = hl.dsp.layout("swapcol r") },
-	{ key = "CTRL + h", desc = "swap column left", dispatch = hl.dsp.layout("swapcol l") },
-	{ key = "CTRL + l", desc = "swap column right", dispatch = hl.dsp.layout("swapcol r") },
 
 	{ header = "Workspaces" },
-	---- up/down (niri Mod+U/I)
-	{ key = "u", desc = "next workspace", dispatch = hl.dsp.focus({ workspace = "e+1" }) },
-	{ key = "i", desc = "previous workspace", dispatch = hl.dsp.focus({ workspace = "e-1" }) },
-	{
-		key = "CTRL + u",
-		desc = "move window to next workspace",
-		dispatch = hl.dsp.window.move({ workspace = "e+1", follow = true }),
-	},
-	{
-		key = "CTRL + i",
-		desc = "move window to previous workspace",
-		dispatch = hl.dsp.window.move({ workspace = "e-1", follow = true }),
-	},
-
 	---- Special Workspaces
 	{ key = "m", desc = "toggle music workspace", dispatch = hl.dsp.workspace.toggle_special("music") },
 	{ key = "minus", desc = "toggle scratchpad", dispatch = hl.dsp.workspace.toggle_special("scratch") },
@@ -255,40 +207,112 @@ for _, bind in ipairs(globalAppBinds) do
 	end
 end
 
--- Workspaces on numbers like niri: SUPER+n focuses, +CTRL (niri) or
--- +SHIFT moves the window there
+-- SUPER+SHIFT+n moves the window to workspace n (old scheme; SUPER+n and
+-- SUPER+CTRL+n come from the shared keymap)
 for index = 1, 9 do
-	local key = tostring(index)
-	hl.bind(mainMod .. key, hl.dsp.focus({ workspace = index }))
-	hl.bind(mainMod .. "CTRL + " .. key, hl.dsp.window.move({ workspace = index, follow = false }))
-	hl.bind(mainMod .. "SHIFT + " .. key, hl.dsp.window.move({ workspace = index, follow = false }))
+	hl.bind(mainMod .. "SHIFT + " .. tostring(index), hl.dsp.window.move({ workspace = index, follow = false }))
 end
-note(mainMod .. "1..9", "focus workspace n")
-note(mainMod .. "CTRL/SHIFT + 1..9", "move window to workspace n")
+note(mainMod .. "SHIFT + 1..9", "move window to workspace n")
 
--- Screenshots without SUPER, like niri's Print family
-section("Screenshots (no SUPER)")
-hl.bind("PRINT", hl.dsp.exec_cmd("grimblast copy area"))
-note("PRINT", "screenshot area to clipboard")
-hl.bind("CTRL + PRINT", hl.dsp.exec_cmd("grimblast copy output"))
-note("CTRL + PRINT", "screenshot monitor to clipboard")
-hl.bind("ALT + PRINT", hl.dsp.exec_cmd("grimblast copy active"))
-note("ALT + PRINT", "screenshot window to clipboard")
+-- Shared keymap. modules/features/keymap in the nixos repo holds the binds
+-- both compositors have in common and renders them to /run/hypr/keymap.lua
+-- at rebuild time (features/hyprland links it there). Each entry is
+-- { key, action, args, desc, locked }; this table turns the
+-- compositor-neutral action into a hyprland dispatcher. An action without a
+-- handler here raises a notification instead of silently doing nothing.
+local sharedActions = {
+	["spawn"] = function(b)
+		return hl.dsp.exec_cmd(table.concat(b.args, " "))
+	end,
+	["launcher"] = function()
+		return launcher_toggle
+	end,
+	["close-window"] = function()
+		return hl.dsp.window.close()
+	end,
+	["quit"] = function()
+		return hl.dsp.exit()
+	end,
+	["toggle-floating"] = function()
+		return hl.dsp.window.float()
+	end,
+	["maximize"] = function()
+		return hl.dsp.window.fullscreen({ action = "toggle", mode = "maximized" })
+	end,
+	["fullscreen"] = function()
+		return hl.dsp.window.fullscreen({ action = "toggle" })
+	end,
+	["focus-left"] = function()
+		return focus_column_left
+	end,
+	["focus-right"] = function()
+		return focus_column_right
+	end,
+	["focus-up"] = function()
+		return hl.dsp.focus({ direction = "up" })
+	end,
+	["focus-down"] = function()
+		return hl.dsp.focus({ direction = "down" })
+	end,
+	["move-left"] = function()
+		return hl.dsp.layout("swapcol l")
+	end,
+	["move-right"] = function()
+		return hl.dsp.layout("swapcol r")
+	end,
+	["move-up"] = function()
+		return hl.dsp.window.move({ direction = "up" })
+	end,
+	["move-down"] = function()
+		return hl.dsp.window.move({ direction = "down" })
+	end,
+	["focus-workspace"] = function(b)
+		return hl.dsp.focus({ workspace = b.args[1] })
+	end,
+	["move-to-workspace"] = function(b)
+		return hl.dsp.window.move({ workspace = b.args[1], follow = false })
+	end,
+	["focus-workspace-next"] = function()
+		return hl.dsp.focus({ workspace = "e+1" })
+	end,
+	["focus-workspace-prev"] = function()
+		return hl.dsp.focus({ workspace = "e-1" })
+	end,
+	["move-to-workspace-next"] = function()
+		return hl.dsp.window.move({ workspace = "e+1", follow = true })
+	end,
+	["move-to-workspace-prev"] = function()
+		return hl.dsp.window.move({ workspace = "e-1", follow = true })
+	end,
+	["screenshot-area"] = function()
+		return hl.dsp.exec_cmd("grimblast copy area")
+	end,
+	["screenshot-screen"] = function()
+		return hl.dsp.exec_cmd("grimblast copy output")
+	end,
+	["screenshot-window"] = function()
+		return hl.dsp.exec_cmd("grimblast copy active")
+	end,
+}
 
--- Media keys, usable on the lock screen
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
-
--- Playback keys (need playerctl installed)
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
-hl.bind("XF86AudioStop", hl.dsp.exec_cmd("playerctl stop"), { locked = true })
-section("Media keys (work on the lock screen)")
-note("XF86Audio*", "volume, mute, playback via wpctl/playerctl")
+local keymapPath = "/run/hypr/keymap.lua"
+local loaded, shared = pcall(dofile, keymapPath)
+if loaded and type(shared) == "table" then
+	section("Shared keymap (nixos modules/features/keymap)")
+	for _, b in ipairs(shared) do
+		local toDispatcher = sharedActions[b.action]
+		if toDispatcher then
+			hl.bind(b.key, toDispatcher(b), { locked = b.locked })
+			if b.desc ~= "" then
+				note(b.key, b.desc)
+			end
+		else
+			notif("keymap: no hyprland handler for action '" .. tostring(b.action) .. "' (" .. b.key .. ")", 8000, "warning")
+		end
+	end
+else
+	notif("keymap: could not load " .. keymapPath .. "\n" .. tostring(shared), 8000, "warning")
+end
 
 -- Write the overview for SUPER + \ to display
 local overviewFile = io.open(overviewPath, "w")
