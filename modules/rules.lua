@@ -59,7 +59,7 @@ hl.window_rule({
 	opaque = true,
 })
 
--- SUPER + grave opencode overlay: full-width sheet dropping down from the very
+-- Opencode overlay: full-width sheet dropping down from the very
 -- top edge of the monitor, so the bar draws over its top strip -- deliberate,
 -- the sheet is meant to run edge to edge. Same idiom as the scratchpad
 -- terminal above: it lives on its own special workspace so the toggle merely
@@ -155,14 +155,6 @@ hl.window_rule({
 	opaque = true,
 })
 
-hl.window_rule({
-	name = "woomer no anim",
-	match = {
-		title = "woomer",
-	},
-	no_anim = true,
-})
-
 -- Define gaps for music workspace
 hl.workspace_rule({
 	workspace = "special:music",
@@ -208,21 +200,3 @@ hl.layer_rule({
 	ignore_alpha = 0,
 })
 
--- Waybar blur
-hl.layer_rule({
-	name = "waybar blur",
-	match = {
-		namespace = "waybar",
-	},
-	blur = true,
-	ignore_alpha = 0,
-})
-
-hl.layer_rule({
-	name = "showkeys",
-	match = {
-		namespace = "showkeys",
-	},
-	blur = false,
-	no_anim = true,
-})

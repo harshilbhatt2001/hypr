@@ -1,7 +1,7 @@
--- Quake-style pull-down overlay for opencode (SUPER + grave).
+-- Quake-style pull-down overlay for opencode.
 --
 -- Every knob for the overlay lives here; the two consumers only read it:
---   modules/binds.lua  -- SUPER + grave toggle, and the kitty spawn command
+--   modules/binds.lua  -- the toggle bind, and the kitty spawn command
 --   modules/rules.lua  -- the window rule that shapes and places the overlay
 --
 -- Edit the numbers below and `hyprctl reload` -- no rebuild needed.

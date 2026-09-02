@@ -22,10 +22,9 @@ local overlay = require("modules.opencode-overlay")
 -- Set modifier keys
 local mainMod = "SUPER + "
 local subMod = mainMod
-local recordingMode = 0
 
 -- Keybinding overview: every bind below carries a desc; they are collected
--- here and written to a text file on config (re)load. SUPER + \ shows it.
+-- here and written to a text file on config (re)load.
 local overviewPath = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/hypr-binds-overview.txt"
 local overviewLines = { "Keybindings (SUPER = Windows key)  —  q closes this window" }
 
@@ -104,11 +103,7 @@ local globalAppBinds = {
 		key = "RETURN",
 		desc = "terminal (kitty)",
 		dispatch = function()
-			if recordingMode == 1 then
-				hl.exec_cmd("kitty -o font_size=24 -o window_margin_width=20")
-			else
-				hl.exec_cmd("kitty")
-			end
+			hl.exec_cmd("kitty")
 		end,
 	},
 
@@ -200,36 +195,6 @@ local globalAppBinds = {
 		key = "SHIFT + minus",
 		desc = "move window to scratchpad",
 		dispatch = hl.dsp.window.move({ workspace = "special:scratch", follow = false }),
-	},
-
-	{ header = "Recording" },
-	-- Youtuber mode lol
-	{
-		key = "z",
-		desc = "toggle recording mode (wshowkeys)",
-		dispatch = function()
-			if recordingMode == 0 then
-				recordingMode = 1
-				hl.exec_cmd(
-					"wshowkeys -a right -F 'FiraMono Nerd Font 35' -s '#cba6f7ff' -f  '#cdd6f4ff' -b '#45475a99' -m 70 -l 60 -t 1000 -a top"
-				)
-				notif("Recording Mode Enabled")
-			else
-				recordingMode = 0
-				hl.exec_cmd("pkill wshowkeys")
-				notif("Recording Mode Disabled")
-			end
-		end,
-	},
-
-	{
-		key = "x",
-		desc = "zoom (woomer, recording mode only)",
-		dispatch = function()
-			if recordingMode == 1 then
-				hl.exec_cmd("woomer --output HDMI-A-2 --radius 2 --monitor HDMI-A-2 -S")
-			end
-		end,
 	},
 
 	{ header = "Screenshots" },
