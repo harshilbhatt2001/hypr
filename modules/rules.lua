@@ -59,6 +59,23 @@ hl.window_rule({
 	opaque = true,
 })
 
+-- SUPER + S YouTube Music scratchpad (shared keymap action `music`): lives on
+-- special:music so the toggle only hides it and playback continues; centered
+-- float. Electron reports the X11 class (title-cased) under XWayland and the
+-- kebab-case one on native Wayland, so match both.
+hl.window_rule({
+	name = "music-scratchpad",
+	match = {
+		class = "^(YouTube Music Desktop App|youtube-music-desktop-app)$",
+	},
+	workspace = "special:music",
+	float = true,
+	size = { 1600, 900 },
+	center = true,
+	animation = "popin 80%",
+	opaque = true,
+})
+
 -- Opencode overlay: full-width sheet dropping down from the very
 -- top edge of the monitor, so the bar draws over its top strip -- deliberate,
 -- the sheet is meant to run edge to edge. Same idiom as the scratchpad
