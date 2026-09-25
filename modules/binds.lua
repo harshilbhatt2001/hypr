@@ -114,8 +114,8 @@ local globalAppBinds = {
 		end,
 	},
 
-	-- File browser
-	{ key = "s", desc = "file browser (nemo)", dispatch = "nemo" },
+	-- File browser (was SUPER + s; that key is the shared `music` action now)
+	{ key = "e", desc = "file browser (nemo)", dispatch = "nemo" },
 
 	-- Power menu
 	{ key = "BACKSPACE", desc = "power menu (lock/logout/shutdown/reboot)", dispatch = "wlogout" },
@@ -226,6 +226,18 @@ local sharedActions = {
 	end,
 	["launcher"] = function()
 		return launcher_toggle
+	end,
+	-- YouTube Music scratchpad: same idiom as the scratchpad terminal — one
+	-- persistent ytmdesktop on special:music (window rule in rules.lua),
+	-- spawned on first use, then only shown/hidden so playback never stops.
+	["music"] = function()
+		return function()
+			if hl.get_windows({ class = "YouTube Music Desktop App" })[1] == nil
+				and hl.get_windows({ class = "youtube-music-desktop-app" })[1] == nil then
+				hl.exec_cmd("ytmdesktop")
+			end
+			hl.dispatch(hl.dsp.workspace.toggle_special("music"))
+		end
 	end,
 	["close-window"] = function()
 		return hl.dsp.window.close()
