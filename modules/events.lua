@@ -2,6 +2,7 @@ local appList = {
 	"wpaperd -d",
 	"quickshell",
 	"way-edges",
+	"hyprpolkitagent",
 }
 
 -- For everything in the applist run it on startup
