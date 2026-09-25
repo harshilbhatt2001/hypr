@@ -1,6 +1,7 @@
 local appList = {
 	"wpaperd -d",
 	"quickshell",
+	"way-edges",
 }
 
 -- For everything in the applist run it on startup
